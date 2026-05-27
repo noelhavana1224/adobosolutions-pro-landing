@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AdoBoost — Cold Outreach That Books Meetings</title>
+  <meta name="description" content="AdoBoost is a done-for-you cold email system. We write the emails, find the leads, and handle replies. You just show up to the calls." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:     #020817;
+      --navy-2:   #070f1f;
+      --navy-3:   #0c1829;
+      --blue:     #2563eb;
+      --blue-h:   #1d4ed8;
+      --blue-l:   #3b82f6;
+      --gold:     #f59e0b;
+      --purple:   #7c3aed;
+      --green:    #22c55e;
+      --text:     #f1f5f9;
+      --text-2:   #cbd5e1;
+      --text-3:   #94a3b8;
+      --border:   rgba(255,255,255,0.08);
+      --border-2: rgba(255,255,255,0.13);
+      --glass:    rgba(255,255,255,0.03);
+      --glass-2:  rgba(255,255,255,0.07);
+      --grad:     linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      --grad-g:   linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
+      --r:        14px;
+      --r-sm:     10px;
+      --r-lg:     20px;
+      --shadow:   0 4px 24px rgba(0,0,0,0.35);
+      --shadow-b: 0 4px 16px rgba(37,99,235,0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(2,8,23,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 48px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo img { height: 34px; width: auto; display: block; }
+    .nav-right { display: flex; align-items: center; gap: 28px; }
+    .nav-right a.link {
+      font-size: 14px; font-weight: 600; color: var(--text-3);
+      transition: color .15s;
+    }
+    .nav-right a.link:hover { color: var(--text-2); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: inherit; font-weight: 700; border: none; cursor: pointer;
+      transition: background .15s, transform .15s; text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--blue); color: #fff;
+      padding: 10px 22px; border-radius: var(--r-sm);
+      font-size: 14px; box-shadow: var(--shadow-b);
+    }
+    .btn-primary:hover { background: var(--blue-h); }
+    .btn-xl { padding: 16px 34px; border-radius: var(--r); font-size: 16px; }
+    .btn-grad {
+      background: var(--grad); color: #fff;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+    }
+    .btn-outline {
+      background: var(--glass-2); border: 1px solid var(--border-2);
+      color: var(--text); padding: 16px 34px;
+      border-radius: var(--r); font-size: 16px;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 90vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 100px 48px 80px;
+      background: linear-gradient(160deg, #020817 0%, #050d20 35%, #0a0a25 65%, #050d1a 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 65% 40%, rgba(37,99,235,0.15) 0%, transparent 55%),
+        radial-gradient(ellipse at 15% 70%, rgba(124,58,237,0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-inner { max-width: 740px; position: relative; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3);
+      border-radius: 100px; padding: 6px 14px;
+      font-size: 11px; font-weight: 700; letter-spacing: .06em;
+      color: var(--blue-l); text-transform: uppercase; margin-bottom: 30px;
+    }
+    h1 {
+      font-size: clamp(44px, 6.5vw, 80px);
+      font-weight: 900; letter-spacing: -2px; line-height: 1.02;
+      margin-bottom: 24px;
+    }
+    .grad-text {
+      background: var(--grad);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 19px; color: var(--text-2);
+      max-width: 580px; line-height: 1.7; margin-bottom: 44px;
+    }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .hero-note { margin-top: 20px; font-size: 13px; color: var(--text-3); }
+    .hero-note span { color: var(--text-2); }
+
+    /* ── PROOF BAR ── */
+    .proof-bar {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: var(--navy-2);
+      display: flex; justify-content: center; flex-wrap: wrap;
+    }
+    .proof-item {
+      flex: 1; min-width: 160px;
+      padding: 32px 40px; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .proof-item:last-child { border-right: none; }
+    .proof-num {
+      font-size: 34px; font-weight: 900; line-height: 1;
+      background: var(--grad);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 6px;
+    }
+    .proof-label { font-size: 13px; color: var(--text-3); font-weight: 600; }
+
+    /* ── SECTION ── */
+    section { padding: 96px 48px; }
+    .max-w { max-width: 1100px; margin: 0 auto; }
+    .sec-head { margin-bottom: 60px; }
+    .sec-head h2 {
+      font-size: clamp(28px, 4vw, 50px); font-weight: 800;
+      letter-spacing: -1px; line-height: 1.1; margin-bottom: 14px;
+    }
+    .sec-head p { font-size: 17px; color: var(--text-2); max-width: 520px; }
+    .sec-head.center { text-align: center; }
+    .sec-head.center p { margin: 0 auto; }
+    .alt-bg { background: var(--navy-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    /* ── WHAT IS ADODBOST (2-col) ── */
+    .what-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 72px; align-items: center;
+    }
+    .what-grid h2 {
+      font-size: clamp(28px, 4vw, 50px); font-weight: 800;
+      letter-spacing: -1px; line-height: 1.1; margin-bottom: 18px;
+    }
+    .what-grid p { font-size: 16px; color: var(--text-2); line-height: 1.75; margin-bottom: 32px; }
+    .check-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 40px; }
+    .check-item { display: flex; align-items: flex-start; gap: 12px; }
+    .check-dot {
+      width: 20px; height: 20px; flex-shrink: 0;
+      background: rgba(37,99,235,0.18); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--blue-l); margin-top: 2px;
+    }
+    .check-item p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+    .check-item p strong { color: var(--text); }
+
+    /* metrics card */
+    .metrics-card {
+      background: var(--navy-3); border: 1px solid var(--border-2);
+      border-radius: var(--r-lg); padding: 36px;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .metrics-card::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 240px; height: 240px;
+      background: radial-gradient(circle, rgba(37,99,235,.15), transparent 70%);
+      pointer-events: none;
+    }
+    .metrics-label {
+      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-3); margin-bottom: 28px;
+    }
+    .metric { margin-bottom: 22px; }
+    .metric-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .metric-name { font-size: 13px; color: var(--text-2); }
+    .metric-val { font-size: 13px; font-weight: 800; color: var(--blue-l); }
+    .bar-bg { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 99px; background: var(--grad); }
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+    .result { display: flex; align-items: center; gap: 10px; }
+    .result-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .result-text { font-size: 13px; color: var(--text-2); }
+    .result-text strong { color: var(--green); }
+
+    /* ── HOW IT WORKS ── */
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px; max-width: 960px; margin: 0 auto;
+    }
+    .step { text-align: center; }
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 2px solid rgba(37,99,235,0.4);
+      background: rgba(37,99,235,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900; color: var(--blue-l);
+      margin: 0 auto 18px;
+    }
+    .step-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step-desc { font-size: 14px; color: var(--text-3); line-height: 1.6; }
+
+    /* ── WHAT YOU GET ── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 32px;
+      transition: background .2s, transform .2s;
+    }
+    .feature-card:hover { background: var(--glass-2); transform: translateY(-2px); }
+    .feature-icon { font-size: 28px; display: block; margin-bottom: 18px; }
+    .feature-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feature-desc { font-size: 14px; color: var(--text-3); line-height: 1.65; }
+
+    /* ── VA SECTION (20%) ── */
+    .va-section {
+      text-align: center;
+      background: var(--navy-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .va-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 100px; padding: 5px 13px;
+      font-size: 11px; font-weight: 700; letter-spacing: .06em;
+      color: var(--gold); text-transform: uppercase; margin-bottom: 20px;
+    }
+    .va-section h2 {
+      font-size: clamp(26px, 4vw, 44px); font-weight: 800;
+      letter-spacing: -1px; line-height: 1.1;
+      max-width: 640px; margin: 0 auto 16px;
+    }
+    .va-section p {
+      font-size: 16px; color: var(--text-2); max-width: 560px;
+      margin: 0 auto 40px; line-height: 1.7;
+    }
+    .va-pills {
+      display: flex; gap: 12px; justify-content: center;
+      flex-wrap: wrap; margin-bottom: 40px;
+    }
+    .pill {
+      background: var(--glass-2); border: 1px solid var(--border-2);
+      border-radius: 100px; padding: 8px 18px;
+      font-size: 13px; font-weight: 600; color: var(--text-2);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center; padding: 110px 24px;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(37,99,235,0.13) 0%, transparent 65%),
+        radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-size: clamp(32px, 5vw, 58px); font-weight: 900;
+      letter-spacing: -2px; line-height: 1.05;
+      margin-bottom: 18px; position: relative;
+    }
+    .cta-section p {
+      font-size: 18px; color: var(--text-2); max-width: 440px;
+      margin: 0 auto 44px; position: relative;
+    }
+    .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); background: var(--navy-2);
+      padding: 28px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-copy { font-size: 13px; color: var(--text-3); }
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+    .footer-links a { font-size: 13px; color: var(--text-3); transition: color .15s; }
+    .footer-links a:hover { color: var(--text-2); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .what-grid { grid-template-columns: 1fr; gap: 48px; }
+      nav { padding: 0 20px; }
+      .nav-right .link { display: none; }
+    }
+    @media (max-width: 640px) {
+      .hero { padding: 80px 20px 60px; min-height: auto; }
+      section { padding: 72px 20px; }
+      footer { padding: 24px 20px; flex-direction: column; text-align: center; }
+      .proof-item { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 20px; }
+      .proof-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="https://adobosolutions.com/" class="logo">
+      <img src="https://adobosolutions.com/assets/ADB2%20Tranparent%202.png" alt="Adobo Solutions" />
+    </a>
+    <div class="nav-right">
+      <a href="https://adobosolutions.com/services.html" class="link">VA Services</a>
+      <a href="https://adobosolutions.com/pricing.html" class="link">Pricing</a>
+      <a href="https://adobosolutions.com/contact.html" class="link">Contact</a>
+      <a href="https://adoboost.adobosolutions.com" class="btn btn-primary">Get AdoBoost →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="badge">⚡ AdoBoost by Adobo Solutions</div>
+      <h1>More Meetings.<br /><span class="grad-text">Less Work.</span></h1>
+      <p class="hero-sub">
+        We run your cold email outreach from end to end. Leads, emails, follow-ups, replies — all handled. You just show up to the calls.
+      </p>
+      <div class="hero-btns">
+        <a href="https://adoboost.adobosolutions.com" class="btn btn-grad btn-xl">Get AdoBoost →</a>
+        <a href="https://adobosolutions.com/contact.html" class="btn btn-outline">Talk to Us</a>
+      </div>
+      <p class="hero-note">No long contracts &nbsp;·&nbsp; <span>Setup in 48 hours</span> &nbsp;·&nbsp; Cancel anytime</p>
+    </div>
+  </section>
+
+  <!-- PROOF BAR -->
+  <div class="proof-bar">
+    <div class="proof-item">
+      <div class="proof-num">62%</div>
+      <div class="proof-label">Avg. Open Rate</div>
+    </div>
+    <div class="proof-item">
+      <div class="proof-num">18%</div>
+      <div class="proof-label">Avg. Reply Rate</div>
+    </div>
+    <div class="proof-item">
+      <div class="proof-num">98%</div>
+      <div class="proof-label">Deliverability Score</div>
+    </div>
+    <div class="proof-item">
+      <div class="proof-num">48h</div>
+      <div class="proof-label">Time to First Send</div>
+    </div>
+  </div>
+
+  <!-- WHAT IS ADODBOST -->
+  <section>
+    <div class="max-w">
+      <div class="what-grid">
+        <div>
+          <h2>Your outreach team.<br /><span class="grad-text">Already hired.</span></h2>
+          <p>
+            AdoBoost is a done-for-you cold email system run by trained Filipino VAs. We handle everything — domain setup, lead lists, email copy, sending, and replies. Most clients see booked calls within the first two weeks.
+          </p>
+          <div class="check-list">
+            <div class="check-item">
+              <div class="check-dot">✓</div>
+              <p><strong>Dedicated sending domain</strong> — warmed up, authenticated, and protected so your emails land in the inbox.</p>
+            </div>
+            <div class="check-item">
+              <div class="check-dot">✓</div>
+              <p><strong>We write the emails</strong> — short, personal, and tested. Not templates. Real copy that gets replies.</p>
+            </div>
+            <div class="check-item">
+              <div class="check-dot">✓</div>
+              <p><strong>We find the leads</strong> — verified contacts matched to your ideal customer profile.</p>
+            </div>
+            <div class="check-item">
+              <div class="check-dot">✓</div>
+              <p><strong>We handle replies</strong> — every interested response is flagged and handed off to you, clean and ready.</p>
+            </div>
+            <div class="check-item">
+              <div class="check-dot">✓</div>
+              <p><strong>Daily reporting</strong> — opens, clicks, replies, and booked calls in your dashboard every morning.</p>
+            </div>
+          </div>
+          <a href="https://adoboost.adobosolutions.com" class="btn btn-grad btn-xl">Get AdoBoost →</a>
+        </div>
+        <div class="metrics-card">
+          <div class="metrics-label">AdoBoost — Live Campaign Stats</div>
+          <div class="metric">
+            <div class="metric-row">
+              <span class="metric-name">Open Rate</span>
+              <span class="metric-val">62%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="width:62%"></div></div>
+          </div>
+          <div class="metric">
+            <div class="metric-row">
+              <span class="metric-name">Reply Rate</span>
+              <span class="metric-val">18%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="width:18%"></div></div>
+          </div>
+          <div class="metric">
+            <div class="metric-row">
+              <span class="metric-name">Meeting Booked Rate</span>
+              <span class="metric-val">9%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="width:9%"></div></div>
+          </div>
+          <div class="metric">
+            <div class="metric-row">
+              <span class="metric-name">Deliverability Score</span>
+              <span class="metric-val">98%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="width:98%"></div></div>
+          </div>
+          <hr class="divider" />
+          <div class="result">
+            <div class="result-dot"></div>
+            <p class="result-text">Last 30 days: <strong>24 new meetings booked</strong> for a 3-person sales team.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="alt-bg">
+    <div class="max-w">
+      <div class="sec-head center">
+        <h2>Live in 48 Hours</h2>
+        <p>From sign-up to first email sent — fast.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-title">You Tell Us Who to Target</div>
+          <p class="step-desc">Give us your ideal customer. Industry, company size, job title — we do the rest.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-title">We Build Everything</div>
+          <p class="step-desc">Domain, warm-up, lead list, email sequences — set up and ready within 48 hours.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-title">Emails Go Out Daily</div>
+          <p class="step-desc">Our VAs send, monitor, and tweak every campaign to keep performance high.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-title">You Get the Meetings</div>
+          <p class="step-desc">Interested replies land in your inbox, enriched and flagged. You just take the call.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section>
+    <div class="max-w">
+      <div class="sec-head">
+        <h2>Everything Included</h2>
+        <p>No add-ons. No surprises. One system, fully managed.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🌐</span>
+          <div class="feature-title">Dedicated Sending Domain</div>
+          <p class="feature-desc">A separate domain just for outreach — warmed up and protected. Your main domain stays clean.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">✉️</span>
+          <div class="feature-title">Email Copywriting</div>
+          <p class="feature-desc">Short, personal emails written by our team. Tested for tone, length, and reply rate.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔍</span>
+          <div class="feature-title">Lead Research</div>
+          <p class="feature-desc">Verified contacts matched to your ICP. No bad data, no bounces.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔁</span>
+          <div class="feature-title">Automated Follow-ups</div>
+          <p class="feature-desc">Multi-step sequences that follow up at the right time — without you lifting a finger.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">💬</span>
+          <div class="feature-title">Reply Management</div>
+          <p class="feature-desc">Our VAs monitor and triage every reply. Hot leads go straight to your calendar.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📊</span>
+          <div class="feature-title">Daily Reports</div>
+          <p class="feature-desc">Opens, replies, and booked calls sent to you every morning. Full visibility, zero effort.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VA SERVICES (20%) -->
+  <section class="va-section">
+    <div class="max-w">
+      <div class="va-eyebrow">🇵🇭 Powered by Adobo Solutions</div>
+      <h2>Need more than outreach?</h2>
+      <p>
+        AdoBoost is built on our team of trained Filipino VAs. If you need admin, social media, customer support, or content — we do that too.
+      </p>
+      <div class="va-pills">
+        <span class="pill">📋 Admin Support</span>
+        <span class="pill">📣 Social Media</span>
+        <span class="pill">💬 Customer Support</span>
+        <span class="pill">✍️ Content Writing</span>
+        <span class="pill">🔍 Lead Research</span>
+      </div>
+      <a href="https://adobosolutions.com/services.html" class="btn btn-outline">See All VA Services →</a>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Ready to fill<br /><span class="grad-text">your calendar?</span></h2>
+    <p>Get AdoBoost running in 48 hours. No long contracts.</p>
+    <div class="cta-btns">
+      <a href="https://adoboost.adobosolutions.com" class="btn btn-grad btn-xl">Get AdoBoost →</a>
+      <a href="mailto:hello@adobosolutions.com" class="btn btn-outline">hello@adobosolutions.com</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="https://adobosolutions.com/" class="logo">
+      <img src="https://adobosolutions.com/assets/ADB2%20Tranparent%202.png" alt="Adobo Solutions" style="height:28px;" />
+    </a>
+    <p class="footer-copy">© 2026 Adobo Solutions. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="https://adoboost.adobosolutions.com">AdoBoost</a>
+      <a href="https://adobosolutions.com/services.html">VA Services</a>
+      <a href="https://adobosolutions.com/pricing.html">Pricing</a>
+      <a href="https://adobosolutions.com/contact.html">Contact</a>
+      <a href="mailto:hello@adobosolutions.com">Email Us</a>
+    </div>
+  </footer>
+
+</body>
+</html>
